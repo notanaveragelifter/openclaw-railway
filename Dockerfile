@@ -24,6 +24,11 @@ COPY scripts ./scripts
 RUN pnpm install --frozen-lockfile
 
 COPY . .
+
+# Ensure workspace templates are present (required for agent bootstrap)
+COPY docs/reference/templates ./docs/reference/templates
+RUN test -f docs/reference/templates/IDENTITY.md || (echo "ERROR: Workspace templates not found" && exit 1)
+
 RUN OPENCLAW_A2UI_SKIP_MISSING=1 pnpm build
 # Force pnpm for UI build (Bun may fail on ARM/Synology architectures)
 ENV OPENCLAW_PREFER_PNPM=1
