@@ -46,6 +46,6 @@ RUN mkdir -p /data /data/workspace /data/.openclaw && \
 USER node
 
 # Start gateway server with default config.
-# Binds to 0.0.0.0 for Railway container platform (requires external access)
+# Binds to LAN (all interfaces) for Railway container platform
 # Set OPENCLAW_GATEWAY_TOKEN or OPENCLAW_GATEWAY_PASSWORD env var for security
-CMD ["node", "dist/index.js", "gateway", "--allow-unconfigured", "--bind", "0.0.0.0"]
+CMD ["node", "dist/index.js", "gateway", "--allow-unconfigured", "--bind", "lan"]
