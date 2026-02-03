@@ -34,20 +34,19 @@ ENV NODE_ENV=production
 # Allow non-root user to write temp files during runtime/tests.
 RUN chown -R node:node /app
 
-# Create data directories with correct permissions for Railway volume
-# NOTE: These get overwritten by volume mount, entrypoint script recreates them
-RUN mkdir -p /data /data/workspace /data/.openclaw /data/cron /data/logs /data/agents && \
-    chown -R node:node /data && \
-    chmod -R 755 /data
+# Create data directories
+RUN mkdir -p /data /data/workspace /data/cron /data/logs /data/agents
 
 # Copy entrypoint script and make executable
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# Security hardening: Run as non-root user
-# The node:22-bookworm image includes a 'node' user (uid 1000)
-# This reduces the attack surface by preventing container escape via root privileges
-USER node
+# Run as root to handle volume permissions on Railway
+# This ensures EACCES errors on /data are resolved
+USER root
+
+# Expose ports for web (8080) and gateway (18789)
+EXPOSE 8080 18789
 
 # Start gateway server via entrypoint script
 # The entrypoint creates directories at runtime (after volume mount)

@@ -1,10 +1,14 @@
 #!/bin/sh
 set -e
 
-# Create required directories at runtime (after volume mount)
-echo "Setting up /data directories..."
-mkdir -p /data/workspace /data/.openclaw /data/cron /data/logs /data/agents 2>/dev/null || true
+# Setup directories (as root, this will always succeed on Railway volumes)
+echo "Ensuring /data directories exist with correct permissions..."
+mkdir -p /data/workspace /data/cron /data/logs /data/agents
+
+# Ensure permissions are correct (redundant but safe)
+chmod -R 755 /data
 
 # Start OpenClaw gateway
-echo "Starting OpenClaw gateway..."
+# Binds to 'lan' to allow external traffic through Railway HTTP proxy
+echo "Starting OpenClaw gateway as root..."
 exec node dist/index.js gateway --allow-unconfigured --bind lan
