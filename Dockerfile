@@ -36,7 +36,7 @@ RUN chown -R node:node /app
 
 # Create data directories with correct permissions for Railway volume
 # CRITICAL: This must happen BEFORE switching to node user
-RUN mkdir -p /data /data/workspace /data/.openclaw && \
+RUN mkdir -p /data /data/workspace /data/.openclaw /data/cron /data/logs /data/agents && \
     chown -R node:node /data && \
     chmod -R 755 /data
 
