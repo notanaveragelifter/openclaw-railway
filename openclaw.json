@@ -1,5 +1,4 @@
 {
-    "$schema": "https://raw.githubusercontent.com/openclaw/openclaw/main/schemas/config.json",
     "gateway": {
         "mode": "local",
         "bind": "lan",
