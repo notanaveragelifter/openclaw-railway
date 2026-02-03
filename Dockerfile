@@ -35,17 +35,20 @@ ENV NODE_ENV=production
 RUN chown -R node:node /app
 
 # Create data directories with correct permissions for Railway volume
-# CRITICAL: This must happen BEFORE switching to node user
+# NOTE: These get overwritten by volume mount, entrypoint script recreates them
 RUN mkdir -p /data /data/workspace /data/.openclaw /data/cron /data/logs /data/agents && \
     chown -R node:node /data && \
     chmod -R 755 /data
+
+# Copy entrypoint script and make executable
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # Security hardening: Run as non-root user
 # The node:22-bookworm image includes a 'node' user (uid 1000)
 # This reduces the attack surface by preventing container escape via root privileges
 USER node
 
-# Start gateway server with default config.
-# Binds to LAN (all interfaces) for Railway container platform
-# Set OPENCLAW_GATEWAY_TOKEN or OPENCLAW_GATEWAY_PASSWORD env var for security
-CMD ["node", "dist/index.js", "gateway", "--allow-unconfigured", "--bind", "lan"]
+# Start gateway server via entrypoint script
+# The entrypoint creates directories at runtime (after volume mount)
+CMD ["/usr/local/bin/docker-entrypoint.sh"]
